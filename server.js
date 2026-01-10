@@ -28,11 +28,20 @@ app.get("/", function (req, res) {
   res.render("index", { title: "Home" })
 })
 
+//Account route 
+app.get("/account/login", function (req, res) {
+  res.render("index", { title: "Account Login" })
+})
+
 
 /* ***********************
  * Local Server Information
  * Values from .env (environment) file
  *************************/
+
+// Local Variables
+app.locals.siteName = "CSE Motors";
+
 const port = process.env.PORT
 const host = process.env.HOST
 

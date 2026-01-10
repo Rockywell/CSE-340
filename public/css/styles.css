@@ -1,6 +1,251 @@
 /******* Change Box Model ***************/
+
+:root {
+  --color-primary: white;
+  --color-secondary: #247BA0;
+  --color-tertiary: #50514F;
+
+  --font-head: "Roboto", system-ui;
+  --font-body: "Inter", ui-sans-serif;
+}
+
 *,
 *:before,
 *:after {
   box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  margin-bottom: -1rem;
+}
+
+body {
+  background-image: url("/images/site/checkerboard.jpg");
+  background-repeat: repeat;
+  background-size: 512px 512px;
+
+  color: var(--color-tertiary);
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-head);
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+#wrapper {
+  background: var(--color-primary);
+  width: 100%;
+  min-height: 100vh;
+  margin: 0 auto;
+}
+
+#wrapper>* {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+#top-header {
+  display: flex;
+  background: var(--color-primary);
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 0.7rem;
+}
+
+#top-header a {
+  text-decoration: none;
+  color: inherit;
+}
+
+#top-header .siteName {
+  font-size: 3rem;
+}
+
+#top-header #tools {
+  align-self: flex-start;
+}
+
+nav {
+  display: flex;
+  background: var(--color-tertiary);
+  color: var(--color-primary);
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25em;
+  margin: 1rem;
+  padding: 1rem 0.7rem;
+}
+
+nav ul {
+  display: flex;
+  list-style: none;
+  justify-content: space-around;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+nav a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.hero {
+  display: flex;
+  position: relative;
+  color: var(--color-secondary);
+  padding: 1rem;
+  align-items: center;
+}
+
+.hero h2 {
+  font-size: clamp(1rem, 4.5vw, 2.2rem);
+  margin: 0 0 0.5rem;
+}
+
+.hero p {
+  font-size: clamp(0.8rem, 4vw, 2rem);
+  margin: 0;
+}
+
+.hero a {
+  display: inline-block;
+}
+
+.hero a img {
+  display: block;
+  width: clamp(70px, 25vw, 200px);
+  height: auto;
+}
+
+.hero picture {
+  display: block;
+  width: 100%;
+}
+
+.hero picture img {
+  display: block;
+  width: 70%;
+  height: auto;
+  margin: 2rem auto 0;
+}
+
+.hero>div {
+  display: grid;
+  position: absolute;
+  justify-items: center;
+  background: rgba(255, 255, 255, 0.8);
+  left: 5%;
+  padding: clamp(0.75rem, 2.5vw, 1.5rem);
+}
+
+.delorean-info {
+  display: flex;
+  justify-content: space-around;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 1.5rem;
+}
+
+.delorean-info>article {
+  flex: 1 1 0;
+  width: 100%;
+}
+
+.delorean-reviews li {
+  font-size: 1.5rem;
+  margin-top: 1rem;
+}
+
+.delorean-upgrades ul {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  grid-auto-rows: 1fr;
+}
+
+.delorean-upgrades li {
+  margin: 0;
+}
+
+.delorean-upgrades figure {
+  margin: 0;
+  text-align: center;
+  background: var(--color-secondary);
+  padding: 0.5rem 0 0 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.delorean-upgrades figcaption {
+  background: var(--color-primary);
+}
+
+.delorean-upgrades img {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  margin: auto;
+}
+
+footer {
+  margin-top: 2rem;
+}
+
+@media (min-width: 800px) {
+  #wrapper {
+    min-height: auto;
+    width: 75vw;
+    border: 0.3rem solid var(--color-secondary);
+    border-radius: 0.5rem;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  #wrapper>* {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  nav {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+  }
+
+  h1 {
+    font-size: 3rem;
+  }
+
+  .hero p {
+    margin: 0 0 2rem;
+  }
+
+  .delorean-info {
+    flex-direction: row-reverse;
+    align-items: flex-start;
+  }
+
+  .delorean-info>div {
+    flex: 1;
+  }
+
+  .delorean-info .delorean-reviews li {
+    margin-top: 1.5rem;
+  }
 }
