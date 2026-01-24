@@ -42,6 +42,11 @@ h2 {
   font-size: 2rem;
 }
 
+img {
+  max-width: 100%;
+  height: auto;
+}
+
 #wrapper {
   background: var(--color-primary);
   width: 100%;
@@ -94,6 +99,7 @@ h2 {
   border-radius: 0.5rem;
   overflow: hidden;
   max-height: 350px;
+  max-width: 500px;
   transition: transform 0.2s ease;
 }
 
@@ -112,7 +118,7 @@ h2 {
 #inv-display img {
   width: 100%;
   /* margin-top: auto; */
-  height: auto;
+  margin: auto;
   object-fit: cover;
   object-position: center center;
   display: block;
@@ -199,7 +205,6 @@ nav a {
 .hero a img {
   display: block;
   width: clamp(70px, 25vw, 200px);
-  height: auto;
 }
 
 .hero picture {
@@ -210,7 +215,6 @@ nav a {
 .hero picture img {
   display: block;
   width: 70%;
-  height: auto;
   margin: 2rem auto 0;
 }
 
@@ -273,12 +277,72 @@ nav a {
 
 .delorean-upgrades img {
   display: block;
-  height: auto;
-  max-width: 100%;
   margin: auto;
 }
 
+/* Inventory Details Section */
+
+.item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.item-details>img {
+  display: block;
+  border-radius: 0.5rem;
+  /* margin: 0 auto; */
+}
+
+.item-details-info>h2 {
+  margin-top: 0;
+}
+
+.details-list {
+  margin: 0;
+  padding: 0;
+  font-size: large;
+  color: black;
+}
+
+.detail-row {
+  padding: 0.5rem 0.5rem;
+}
+
+.detail-row:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.04);
+  border-radius: 2px;
+}
+
+.detail-row dt,
+.detail-row dd {
+  display: inline;
+  margin: 0;
+}
+
+.detail-row dt {
+  font-weight: 600;
+}
+
+.detail-row dt::after {
+  content: ": ";
+}
+
+.detail-row dd {
+  color: var(--color-tertiary);
+}
+
+
+
+
+
+
 footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
   margin-top: 2rem;
 }
 
@@ -322,4 +386,13 @@ footer {
   .delorean-info .delorean-reviews li {
     margin-top: 1.5rem;
   }
+
+  .item-details {
+    flex-direction: row;
+  }
+
+  .item-details>img {
+    max-width: 45%;
+  }
+
 }

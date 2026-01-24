@@ -7,10 +7,12 @@
  *************************/
 const express = require("express")
 const expressLayouts = require("express-ejs-layouts")
+
 const env = require("dotenv").config()
 const app = express()
 const static = require("./routes/static")
 const inventoryRoute = require("./routes/inventoryRoute")
+const errorRoute = require("./routes/errorRoute")
 const baseController = require("./controllers/baseController")
 const utilities = require("./utilities/index")
 
@@ -35,9 +37,13 @@ app.get("/", utilities.handleErrors(baseController.buildHome))
 app.use("/inv", inventoryRoute)
 
 //Account route 
-app.get("/account/login", function (req, res) {
-  res.render("index", { title: "Account Login" })
-})
+app.get("/account/login", utilities.handleErrors(async function (req, res) {
+  let nav = await utilities.getNav()
+  res.render("index", { title: "Account Login", nav })
+}))
+
+//Intentional Error Route
+app.use("/trigger-error", errorRoute);
 
 // File Not Found Route - must be last route in list
 app.use(async (req, res, next) => {
@@ -52,6 +58,7 @@ app.use(async (req, res, next) => {
 app.use(async (err, req, res, next) => {
   let nav = await utilities.getNav()
   console.error(`Error at: "${req.originalUrl}": ${err.message}`)
+  let message;
   if (err.status == 404) { message = err.message } else { message = 'Oh no! There was a crash. Maybe try a different route?' }
   res.render("errors/error", {
     title: err.status || 'Server Error',
