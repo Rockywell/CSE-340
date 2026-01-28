@@ -1,5 +1,5 @@
-const invModel = require("../models/inventory-model")
 const utilities = require("../utilities/")
+const invModel = require("../models/inventory-model")
 
 const invCont = {}
 
@@ -15,10 +15,11 @@ invCont.buildByClassificationId = async function (req, res, next) {
 
     const className = data[0].classification_name
 
-    res.render("./inventory/classification", {
+    res.render("inventory/classification", {
         title: className + " vehicles",
         nav,
         grid,
+        errors: null
     })
 }
 
@@ -33,14 +34,16 @@ invCont.buildByInventoryId = async function (req, res, next) {
     const itemModel = data.inv_model;
     const itemMake = data.inv_make;
 
-    res.render("./inventory/item", {
+    res.render("inventory/item", {
         title: `${itemYear} ${itemModel} ${itemMake}`,
         name: `${itemModel} ${itemMake}`,
         nav,
         grid,
+        errors: null
     })
 }
 
+// VEHICLE REFERENCE OBJECT
 // {
 //   inv_id: 2,
 //   inv_make: "Batmobile",
