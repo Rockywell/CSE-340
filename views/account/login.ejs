@@ -6,19 +6,30 @@
 
         <%- messages() %>
 
-            <form class="login">
-                <label for="accountEmail">Email:</label>
-                <input type="email" id="accountEmail" name="account_email" required>
+            <% if (errors) { %>
+                <ul class="error">
+                    <% errors.array().forEach(error=> { %>
+                        <li>
+                            <%= error.msg %>
+                        </li>
+                        <% }) %>
+                </ul>
+                <% } %>
 
-                <label for="accountPassword">Password</label>
-                <span>Passwords must be at least 12 characters and contain at least 1 number, 1 capital letter and 1
-                    special character</span>
-                <input type="password" id="accountPassword" name="account_password" required
-                    pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$">
+                    <form class="login" id="loginForm" action="/account/login" method="post">
+                        <label for="accountEmail">Email:</label>
+                        <input type="email" id="accountEmail" name="account_email" required>
 
-                <button type="submit">Login</button>
+                        <label for="accountPassword">Password</label>
+                        <span>Passwords must be at least 12 characters and contain at least 1 number, 1 capital letter
+                            and 1
+                            special character</span>
+                        <input type="password" id="accountPassword" name="account_password" required
+                            pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$">
 
-                <div class="signup-text">
-                    No Account? <a href="/account/register">Sign-up</a>
-                </div>
-            </form>
+                        <button type="submit">Login</button>
+
+                        <div class="signup-text">
+                            No Account? <a href="/account/register">Sign-up</a>
+                        </div>
+                    </form>

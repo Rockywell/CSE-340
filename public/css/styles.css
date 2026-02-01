@@ -83,14 +83,20 @@ form label {
   font-size: medium;
 }
 
-form input {
+form textarea {
+  height: 150px;
+  width: 400px;
+  resize: horizontal
+}
+
+form :is(input, select, textarea) {
   border: none;
   border-radius: 0.2rem;
   margin: 0.2rem 0;
   padding: 0.25rem;
 }
 
-form input+label {
+form :is(input, select, textarea)~label {
   margin-top: 5px;
 }
 
@@ -103,10 +109,10 @@ form span {
 
 form button[type=submit] {
   color: var(--color-tertiary);
-  width: 64px;
+  /* width: 64px; */
   border: none;
   border-radius: 9999px;
-  padding: 0.3rem 0;
+  padding: 0.3rem 1rem;
   margin: 0.3rem 0;
   align-self: center;
   font-size: x-small;

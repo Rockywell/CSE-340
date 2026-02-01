@@ -1,4 +1,8 @@
+const path = require("path")
+const fs = require("fs/promises")
 const invModel = require("../models/inventory-model")
+
+const PUBLIC_DIR = path.resolve(process.cwd(), "public");
 const Util = {}
 
 /* ************************
@@ -93,6 +97,25 @@ Util.buildItemDetails = async function (item) {
     return grid
 }
 
+/* **************************************
+* Builds the select form element from provided classifications in HTML.
+* ************************************ */
+Util.buildClassificationSelect = async function (classification_id = null) {
+    const data = await invModel.getClassifications();
+
+    let select = '<label for="classificationId">Classification</label><select name="classification_id" id="classificationId" required>'
+    select += '<option value="">Choose a Classification</option>'
+
+    data.rows.forEach((row) => {
+        const isSelected = row.classification_id == classification_id ? 'selected' : '';
+        select += `<option value="${row.classification_id}" ${isSelected}>${row.classification_name}</option>`
+    })
+
+    select += '</select>'
+
+    return select
+}
+
 // {
 //   inv_id: 2,
 //   inv_make: "Batmobile",
@@ -106,6 +129,33 @@ Util.buildItemDetails = async function (item) {
 //   inv_color: "Black",
 //   classification_id: 1,
 // }
+
+
+/*
+* Middleware for checking conditions
+*/
+Util.fileExists = async function (filePath) {
+    try {
+        await fs.access(filePath);
+        return true
+    }
+    catch {
+        return false;
+    }
+}
+
+// Checks that the file exists on the server.
+Util.publicFileExists = async function (filePath) {
+
+    const relativePath = String(filePath).replace(/^\/+/, "");
+    const fullPath = path.resolve(PUBLIC_DIR, relativePath);
+
+    // block "../" escape
+    if (!fullPath.startsWith(PUBLIC_DIR + path.sep)) return false;
+
+    return await Util.fileExists(fullPath);
+}
+
 
 /* ****************************************
  * Middleware For Handling Errors

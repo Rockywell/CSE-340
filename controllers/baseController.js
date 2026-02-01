@@ -8,7 +8,7 @@ baseController.buildHome = async function (req, res) {
 
 baseController.triggerError = async function (req, res, next) {
     const err = new Error("Intentional 500 status error.");
-    err.status = 500;
+    res.status = err.status = 500;
     throw err;
 };
 

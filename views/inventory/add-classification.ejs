@@ -1,0 +1,30 @@
+<% if (title) { %>
+    <h1>
+        <%= title %>
+    </h1>
+    <% } else { res.redirect('/') } %>
+
+        <%- messages() %>
+
+            <% if (errors) { %>
+                <ul class="error">
+                    <% errors.array().forEach(error=> { %>
+                        <li>
+                            <%= error.msg %>
+                        </li>
+                        <% }) %>
+                </ul>
+                <% } %>
+
+                    <form class="classification" action="/inv/add-class" method="POST">
+                        <!-- action="/account/register" method="POST" -->
+                        <label for="classificationName">Classification Name</label>
+                        <span>Name must be alphabetical characters only.</span>
+                        <input type="text" id="classificationName" name="classification_name"
+                            title="Name must be alphabetical characters only." required
+                            value="<%= locals.classification_name %>" pattern="[A-Za-z]+">
+
+                        <!-- <span>Name must be alphabetical characters only.</span> -->
+
+                        <button type="submit">Add Classification</button>
+                    </form>

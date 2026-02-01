@@ -7,7 +7,7 @@
         <%- messages() %>
 
             <% if (errors) { %>
-                <ul class="notice">
+                <ul class="error">
                     <% errors.array().forEach(error=> { %>
                         <li>
                             <%= error.msg %>
@@ -18,20 +18,23 @@
 
                     <form class="register" action="/account/register" method="POST">
                         <label for="accountFirstname">First name</label>
-                        <input type="text" id="accountFirstname" name="account_firstname" required>
+                        <input type="text" id="accountFirstname" name="account_firstname" required
+                            value="<%= locals.account_firstname %>">
 
                         <label for="accountLastname">Last name</label>
-                        <input type="text" id="accountLastname" name="account_lastname" required>
+                        <input type="text" id="accountLastname" name="account_lastname" required
+                            value="<%= locals.account_lastname %>">
 
                         <label for="accountEmail">Email address</label>
                         <input type="email" id="accountEmail" name="account_email" placeholder="cse-motors@gmail.com"
-                            required>
+                            value="<%= locals.account_email %>" required>
 
                         <label for="accountPassword">Password</label>
                         <span>Passwords must be at least 12 characters and contain at least 1 number, 1 capital letter
                             and 1
                             special character</span>
-                        <input type="password" id="accountPassword" name="account_password" required
+                        <input type="password" id="accountPassword" name="account_password" title="Passwords must be at least 12 characters and contain at least 1 number, 1 capital letter
+                            and 1 special character" required
                             pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$">
 
                         <button type="submit">Register</button>
