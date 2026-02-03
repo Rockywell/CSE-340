@@ -34,6 +34,30 @@ ul.error {
   padding: 0.2em;
 }
 
+.controls {
+  display: inline-flex;
+  background-color: var(--color-secondary);
+  color: var(--color-primary);
+  padding: 0.5rem;
+  border: solid 2px var(--color-tertiary);
+  border-radius: 0.5em;
+  flex-direction: column;
+}
+
+.controls>label {
+  display: block;
+  font-size: medium;
+}
+
+.controls *:not(label)~label {
+  margin-top: 5px;
+}
+
+.controls :is(input, select, textarea) {
+  border: none;
+  margin: 0.2rem 0;
+}
+
 
 html,
 body {
@@ -79,6 +103,13 @@ form {
   flex-direction: column;
 }
 
+input,
+select,
+textarea {
+  border-radius: 0.2rem;
+  padding: 0.25rem;
+}
+
 form label {
   font-size: medium;
 }
@@ -91,9 +122,7 @@ form textarea {
 
 form :is(input, select, textarea) {
   border: none;
-  border-radius: 0.2rem;
   margin: 0.2rem 0;
-  padding: 0.25rem;
 }
 
 form :is(input, select, textarea)~label {
@@ -438,7 +467,53 @@ nav a {
 }
 
 
+table {
+  width: 100%;
+  margin-top: 1rem;
 
+  border-collapse: collapse;
+
+  border: 3px solid var(--color-secondary);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+table:has(tbody) {
+  overflow: visible;
+}
+
+thead tr>* {
+  border-bottom: 2px solid var(--color-tertiary);
+}
+
+th,
+td {
+  padding: 0.5rem 0.5rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+/* zebra striping */
+tbody tr:nth-child(odd)>th,
+tbody tr:nth-child(odd)>td {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+/* tbody tr:nth-child(odd)>th:first-child,
+tbody tr:nth-child(odd)>td:first-child {
+  border-top-left-radius: 2px;
+  border-bottom-left-radius: 2px;
+}
+
+tbody tr:nth-child(odd)>th:last-child,
+tbody tr:nth-child(odd)>td:last-child {
+  border-top-right-radius: 2px;
+  border-bottom-right-radius: 2px;
+} */
+
+tbody td {
+  color: var(--color-tertiary);
+}
 
 
 

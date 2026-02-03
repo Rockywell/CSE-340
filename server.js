@@ -8,6 +8,7 @@
 const express = require("express")
 const expressLayouts = require("express-ejs-layouts")
 const session = require("express-session")
+const cookieParser = require("cookie-parser")
 const pool = require('./database/')
 
 const app = express()
@@ -52,6 +53,10 @@ app.use(function (req, res, next) {
   res.locals.currentYear = new Date().getFullYear()
   next()
 })
+
+app.use(cookieParser())
+
+app.use(utilities.checkJWTToken)
 
 
 /* ***********************

@@ -5,7 +5,32 @@
     <% } else { res.redirect('/') } %>
 
         <%- messages() %>
-            <ul>
-                <li><a href="/inv/add-class">Add New Classification</a></li>
-                <li><a href="/inv/add-item">Add New Vehicle</a></li>
-            </ul>
+
+            <% if (errors) { %>
+                <ul class="error">
+                    <% errors.array().forEach(error=> { %>
+                        <li>
+                            <%= error.msg %>
+                        </li>
+                        <% }) %>
+                </ul>
+                <% } %>
+
+                    <section>
+                        <ul>
+                            <li><a href="/inv/add-class">Add New Classification</a></li>
+                            <li><a href="/inv/add-item">Add New Vehicle</a></li>
+                        </ul>
+
+                        <h2>Manage Inventory</h2>
+
+                        <p>Select a classification from the list to see the items belonging to the classification.</p>
+                        <div class="controls"> <%- classificationSelect %></div>
+
+                        <table id="inventoryDisplay"></table>
+
+                        <noscript>JavaScript must be enabled to use this page.</noscript>
+
+                    </section>
+
+                    <script src="../../js/inventory.js"></script>

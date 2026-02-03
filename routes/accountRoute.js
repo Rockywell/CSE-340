@@ -8,6 +8,7 @@ const regValidate = require('../utilities/account-validation')
 
 
 // Route to build inventory by classification view
+router.get("/", utilities.checkLogin, utilities.handleErrors(accountController.buildManager));
 router.get("/login", utilities.handleErrors(accountController.buildLogin));
 router.get("/register", utilities.handleErrors(accountController.buildRegister));
 
@@ -23,9 +24,7 @@ router.post(
     "/login",
     regValidate.loginRules(),
     regValidate.checkLoginData,
-    (req, res) => {
-        res.status(200).send('login process')
-    }
+    utilities.handleErrors(accountController.accountLogin)
 )
 
 
