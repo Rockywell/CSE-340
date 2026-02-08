@@ -94,6 +94,20 @@ async function updateInventory(inv_id, inv_make, inv_model, inv_description, inv
     }
 }
 
+/* *****************************
+*   Deletes inventory item/vehicle
+* *************************** */
+async function deleteInventory(inv_id) {
+    try {
+        const sql = $sql = 'DELETE FROM inventory WHERE inv_id = $1';
+        const data = await pool.query(sql, [
+            inv_id
+        ])
+        return data;
+    } catch (error) {
+        return error.message
+    }
+}
 
 /* **********************
  *   Check for existing classification
@@ -109,4 +123,4 @@ async function checkExistingClassification(classification_name) {
 }
 
 
-module.exports = { getClassifications, getInventoryByClassificationId, getItemByInventoryId, registerClassification, registerInventory, checkExistingClassification, updateInventory };
+module.exports = { getClassifications, getInventoryByClassificationId, getItemByInventoryId, registerClassification, registerInventory, checkExistingClassification, updateInventory, deleteInventory };

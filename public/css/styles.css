@@ -91,10 +91,14 @@ img {
   height: auto;
 }
 
+button:disabled {
+  pointer-events: none;
+}
 
 /* Form elements */
 form {
   display: inline-flex;
+  min-width: 250px;
   background-color: var(--color-secondary);
   color: var(--color-primary);
   padding: 0.5rem 1.5rem;

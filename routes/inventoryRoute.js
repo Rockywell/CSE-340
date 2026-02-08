@@ -10,38 +10,49 @@ const invValidate = require('../utilities/inventory-validation')
 // router.get("/", (req, res) => {
 //     res.status(200).send('d process')
 // });
-router.get("/", utilities.handleErrors(invController.buildManager));
+router.get("/", utilities.checkEmployeeOrAdmin, utilities.handleErrors(invController.buildManager));
 
-router.get("/add-class", utilities.handleErrors(invController.buildClassificationRegister));
-router.get("/add-item", utilities.handleErrors(invController.buildInventoryRegister));
+router.get("/add-class", utilities.checkEmployeeOrAdmin, utilities.handleErrors(invController.buildClassificationRegister));
+router.get("/add-item", utilities.checkEmployeeOrAdmin, utilities.handleErrors(invController.buildInventoryRegister));
 
 // Process to edit vehicle data
-router.get("/edit/:inventoryId", utilities.handleErrors(invController.buildInventoryEditor));
+router.get("/edit/:inventoryId", utilities.checkEmployeeOrAdmin, utilities.handleErrors(invController.buildInventoryEditor));
+router.get("/delete/:inventoryId", utilities.checkEmployeeOrAdmin, utilities.handleErrors(invController.buildInventoryDeleter));
 
 router.get("/type/:classificationId", utilities.handleErrors(invController.buildByClassificationId));
 router.get("/detail/:inventoryId", utilities.handleErrors(invController.buildByInventoryId));
 
-router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON))
+router.get("/getInventory/:classificationId", utilities.handleErrors(invController.getInventoryJSON))
 
 
 // Process new classification data
 router.post(
     "/add-class",
+    utilities.checkEmployeeOrAdmin,
     invValidate.classificationRules(),
     invValidate.checkClassificationData,
     utilities.handleErrors(invController.registerClassification)
 )
 router.post(
     "/add-item",
+    utilities.checkEmployeeOrAdmin,
     invValidate.inventoryRules(),
     invValidate.checkInventoryData,
     utilities.handleErrors(invController.registerInventory)
 )
 // Process updated inventory data
 router.post("/update/",
+    utilities.checkEmployeeOrAdmin,
     invValidate.newInventoryRules(),
     invValidate.checkUpdateData,
-    utilities.handleErrors(invController.updateInventory))
+    utilities.handleErrors(invController.updateInventory)
+)
+router.post("/delete/",
+    utilities.checkEmployeeOrAdmin,
+    invValidate.newInventoryRules(),
+    // invValidate.checkUpdateData,
+    utilities.handleErrors(invController.deleteInventory)
+)
 
 
 

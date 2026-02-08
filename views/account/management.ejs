@@ -5,3 +5,29 @@
     <% } else { res.redirect('/') } %>
 
         <%- messages() %>
+
+            <% if (loggedin) { %>
+
+                <!-- Greeting for all account types -->
+                <h2>Welcome <%= accountData.account_firstname %>
+                </h2>
+
+                <!-- Update Account Information link (for all logged-in users) -->
+                <p>
+                    You're logged in.<br>
+                    <a href="/account/update/<%= accountData.account_id %>">
+                        Update Account Information
+                    </a>
+                </p>
+
+                <!-- Inventory Management: ONLY for Employee or Admin -->
+                <% if (accountData.account_type==="Employee" || accountData.account_type==="Admin" ) { %>
+                    <h3>Inventory Management</h3>
+                    <p>
+                        <a href="/inv/">
+                            Manage Inventory
+                        </a>
+                    </p>
+                    <% } %>
+
+                        <% } %>

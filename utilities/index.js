@@ -194,6 +194,22 @@ Util.checkLogin = (req, res, next) => {
     }
 }
 
+Util.checkEmployeeOrAdmin = (req, res, next) => {
+    const account = res.locals.accountData;
+
+
+    if (!account) {
+        req.flash("notice", "Please log in.");
+        return res.status(401).redirect("/account/login")
+    }
+
+    const type = account.account_type;
+    if (type === "Employee" || type === "Admin") return next();
+
+    req.flash("notice", "You are not authorized to access that resource.");
+    return res.status(403).redirect("/account/login")
+};
+
 
 /* ****************************************
  * Middleware For Handling Errors

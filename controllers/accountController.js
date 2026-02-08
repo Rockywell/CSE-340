@@ -34,11 +34,21 @@ accountController.buildRegister = async function (req, res, next) {
 accountController.buildManager = async function (req, res) {
     const nav = await utilities.getNav()
     res.render("account/management", {
-        title: "You're logged in",
+        title: "Account Management",
         nav,
         errors: null
     })
 }
+
+accountController.buildAccountEditor = async function (req, res) {
+    const nav = await utilities.getNav()
+    res.render("account/edit-account", {
+        title: "Edit Account",
+        nav,
+        errors: null
+    })
+}
+
 
 
 /* ****************************************
@@ -127,6 +137,70 @@ accountController.accountLogin = async function (req, res) {
         }
     } catch (error) {
         throw new Error('Access Forbidden')
+    }
+}
+
+/* ****************************************
+ *  Process logout
+ * ************************************ */
+accountController.logout = async function (req, res) {
+    // Clear cookies
+    res.clearCookie("jwt");
+    res.clearCookie("sessionId");
+
+    await req.flash("notice", "You have been logged out.");
+    res.redirect("/");
+};
+
+
+/* ****************************************
+*  Edit account
+* *************************************** */
+accountController.updateAccount = async function (req, res) {
+    try {
+        const allowedFields = [
+            "account_id",
+            "account_firstname",
+            "account_lastname",
+            "account_email",
+            "account_password"
+        ]
+
+        const newData = {
+            ...res.locals.accountData,
+            ...req.body
+        }
+
+        // Filters out fields from the request body that won't be used for account processing.
+        const newAccountData = Object.fromEntries(
+            Object.entries(newData).filter(([key]) =>
+                allowedFields.includes(key)
+            )
+        )
+
+
+        // Hash the password if a new one was sent.
+        if (req.body.account_password) newAccountData.account_password = bcrypt.hashSync(req.body.account_password, 10)
+
+        let accountResults = await accountModel.updateAccount(...Object.values(newAccountData))
+        delete accountResults.account_password;
+
+        const accessToken = jwt.sign(accountResults, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 })
+        if (process.env.NODE_ENV === 'development') {
+            res.cookie("jwt", accessToken, { httpOnly: true, maxAge: 3600 * 1000 })
+        } else {
+            res.cookie("jwt", accessToken, { httpOnly: true, secure: true, maxAge: 3600 * 1000 })
+        }
+
+        let accountName = `${accountResults.account_firstname} ${accountResults.account_lastname}`;
+
+        req.flash("notice", `${accountName}'s account was successfully updated.`)
+        res.redirect("/account/")
+    } catch (err) {
+        let accountName = `${res.locals.accountData.account_firstname} ${res.locals.accountData.account_lastname}`;
+
+        await req.flash("error", `Sorry, the update failed for ${accountName}.`)
+        res.redirect("/account/")
     }
 }
 

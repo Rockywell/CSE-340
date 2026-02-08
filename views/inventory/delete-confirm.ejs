@@ -1,0 +1,43 @@
+<% if (title) { %>
+    <h1>
+        <%= title %>
+    </h1>
+    <% } else { res.redirect('/') } %>
+
+        <%- messages() %>
+
+            <% if (errors) { %>
+                <ul class="error">
+                    <% errors.array().forEach(error=> { %>
+                        <li>
+                            <%= error.msg %>
+                        </li>
+                        <% }) %>
+                </ul>
+                <% } %>
+
+                    <form class="inventory" id="deleteForm" action="/inv/delete" method="POST">
+                        <label for="invMake">Make</label>
+                        <input type="text" id="invMake" name="inv_make" placeholder="Min of 3 characters" readonly
+                            minlength="3" value="<%= locals.inv_make %>">
+
+                        <label for="invModel">Model</label>
+                        <input type="text" id="invModel" name="inv_model" placeholder="Min of 3 characters" readonly
+                            minlength="3" value="<%= locals.inv_model %>">
+
+                        <label for="invPrice">Price</label>
+                        <input type="number" id="invPrice" name="inv_price" readonly value="<%= locals.inv_price %>"
+                            min="0" step="0.01" title="Price must be a number.">
+
+                        <label for="invYear">Year</label>
+                        <input type="number" id="invYear" name="inv_year" placeholder="4-digit year" readonly
+                            value="<%= locals.inv_year || '1885'%>" min="1885" max="<%= currentYear %>" step="1"
+                            title="Year must be a 4-digit number.">
+
+
+                        <span>Confirm Deletion - The delete is permanent.</span>
+                        <button type="submit">Delete Vehicle</button>
+                        <input type="hidden" name="inv_id" required<% if(locals.inv_id) { %> value="<%= locals.inv_id %>
+                            "
+                            <% } %>>
+                    </form>
