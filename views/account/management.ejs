@@ -20,8 +20,8 @@
                     </a>
                 </p>
 
-                <!-- Inventory Management: ONLY for Employee or Admin -->
                 <% if (accountData.account_type==="Employee" || accountData.account_type==="Admin" ) { %>
+                    <!-- Inventory Management: ONLY for Employee or Admin -->
                     <h3>Inventory Management</h3>
                     <p>
                         <a href="/inv/">
