@@ -2,6 +2,23 @@ const pool = require("../database/")
 const bcrypt = require("bcryptjs");
 
 
+/* ***************************
+ *  Get all accounts data
+ * ************************** */
+async function getAccounts() {
+    return await pool.query("SELECT * FROM public.account ORDER BY account_firstname")
+}
+
+/* ***************************
+ *  Get all accounts types
+ * ************************** */
+async function getAccountTypes() {
+    const { rows } = await pool.query(`
+    SELECT unnest(enum_range(NULL::public.account_type)) AS type
+  `);
+
+    return rows.map(t => t.type); // ["Admin","Client","Employee"]
+}
 /* *****************************
 *   Register new account
 * *************************** */
@@ -47,19 +64,19 @@ async function updateAccount(account_id, account_firstname, account_lastname, ac
     }
 }
 
+async function updateAccountType(account_id, account_type) {
 
-/* **********************
- *   Check for existing email
- * ********************* */
-async function checkExistingEmail(account_email) {
     try {
-        const sql = "SELECT * FROM account WHERE account_email = $1"
-        const email = await pool.query(sql, [account_email])
-        return email.rowCount >= 1
+        const sql = "UPDATE public.account SET account_type = $1 WHERE account_id = $2 RETURNING *";
+        const data = await pool.query(sql, [account_type, account_id]);
+
+        return data.rows[0];
     } catch (error) {
         throw error.message
     }
 }
+
+
 
 /* **********************
  *   Check for existing email
@@ -140,4 +157,4 @@ async function getAccountById(account_id) {
 
 
 
-module.exports = { registerAccount, updateAccount, checkExistingEmail, checkExistingPassword, getAccountByEmail, getAccountById };
+module.exports = { getAccounts, getAccountTypes, registerAccount, updateAccount, updateAccountType, checkExistingEmail, checkExistingPassword, getAccountByEmail, getAccountById };

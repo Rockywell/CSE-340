@@ -15,7 +15,7 @@
                 <!-- Update Account Information link (for all logged-in users) -->
                 <p>
                     You're logged in.<br>
-                    <a href="/account/update/<%= accountData.account_id %>">
+                    <a href="/account/update">
                         Update Account Information
                     </a>
                 </p>
@@ -28,6 +28,20 @@
                             Manage Inventory
                         </a>
                     </p>
+
+                    <h3>User Role Management</h3>
+
+                    <p>Select a user from the list</p>
+                    <div class="controls">
+                        <%- accountSelect %>
+                            <a class="button" id="manageRoleLink"
+                                href="/account/update/<%= accountData.account_id %>/role">
+                                Mangage Role
+                            </a>
+                    </div>
                     <% } %>
 
                         <% } %>
+
+
+                            <script src="/js/account-management.js"></script>

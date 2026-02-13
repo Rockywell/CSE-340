@@ -3,9 +3,16 @@ const path = require("path")
 const fs = require("fs/promises")
 
 const invModel = require("../models/inventory-model")
+const accountModel = require("../models/account-model")
 require("dotenv").config()
 
 const PUBLIC_DIR = path.resolve(process.cwd(), "public");
+const ROLE_HIERARCHY = {
+    Admin: 3,
+    Employee: 2,
+    Client: 1
+};
+
 const Util = {}
 
 /* ************************
@@ -119,19 +126,65 @@ Util.buildClassificationSelect = async function (classification_id = null) {
     return select
 }
 
-// {
-//   inv_id: 2,
-//   inv_make: "Batmobile",
-//   inv_model: "Custom",
-//   inv_year: "2007",
-//   inv_description: "Ever want to be a super hero? now you can with the batmobile. This car allows you to switch to bike mode allowing you to easily maneuver through traffic during rush hour.",
-//   inv_image: "/images/vehicles/batmobile.jpg",
-//   inv_thumbnail: "/images/vehicles/batmobile-tn.jpg",
-//   inv_price: "65000",
-//   inv_miles: 29887,
-//   inv_color: "Black",
-//   classification_id: 1,
-// }
+/* **************************************
+* Builds the select element from database accounts in HTML.
+* ************************************ */
+Util.buildAccountSelect = async function (account_id = null) {
+    const data = await accountModel.getAccounts()
+
+    const userAccount = data.rows.find(a => String(a.account_id) === String(account_id));
+
+
+    const userRoleLevel = ROLE_HIERARCHY[userAccount.account_type];
+    let acessibleAccounts = data.rows.filter(({ account_type }) => (ROLE_HIERARCHY[account_type] ?? 0) <= userRoleLevel);
+
+
+    let select = '<label for="accountList">Accounts</label><select name="account_id" id="accountList" required>'
+    select += '<option value="">Select an account</option>'
+
+    acessibleAccounts.forEach((account) => {
+        const isSelected = account.account_id == account_id ? 'selected' : '';
+        select += `<option value="${account.account_id}" ${isSelected}>${account.account_firstname} ${account.account_lastname}</option>`
+    })
+
+    select += '</select>'
+
+    return select
+}
+
+/* **************************************
+* Builds the select element from database account_types in HTML.
+* ************************************ */
+Util.buildAccountTypeSelect = async function (account_type = null, selectedAccountType = null) {
+    const roles = await accountModel.getAccountTypes();
+
+    const roleLevel = ROLE_HIERARCHY[account_type] ?? 3
+
+    const accessibleRoles = roles.filter(role => (ROLE_HIERARCHY[role] ?? 0) <= roleLevel);
+
+    let select = '<label for="accountTypeList">Account Type</label><select name="account_type" id="accountTypeList" required>'
+    select += '<option value="">Select an account type</option>'
+
+    accessibleRoles.forEach((role) => {
+        const isSelected = role == selectedAccountType ? 'selected' : '';
+        select += `<option value="${role}" ${isSelected}>${role}</option>`
+    })
+
+    select += '</select>'
+
+    return select
+}
+
+
+/* ****************************************
+* Middleware for retrieving/returning values
+**************************************** */
+Util.getTargetAccountId = function (req) {
+    const id = req.params?.accountId ?? req.actorId;
+    if (!id) throw new Error("Missing target account id");
+
+    return id;
+}
 
 
 /* ****************************************
@@ -173,6 +226,9 @@ Util.checkJWTToken = (req, res, next) => {
                     res.clearCookie("jwt")
                     return res.redirect("/account/login")
                 }
+                // Useful for validation and controller processes.
+                req.actorId = accountData.account_id;
+
                 res.locals.accountData = accountData
                 res.locals.loggedin = 1
                 next()
@@ -209,6 +265,57 @@ Util.checkEmployeeOrAdmin = (req, res, next) => {
     req.flash("notice", "You are not authorized to access that resource.");
     return res.status(403).redirect("/account/login")
 };
+
+/* ****************************************
+ *  Checks if the first account_type has the permissions to access the specified target account type.
+ * ************************************ */
+Util.canAccessRole = async (userType, targetType = "Client") => {
+    try {
+
+        const accountTypes = await accountModel.getAccountTypes();
+
+        const userRoleLevel = ROLE_HIERARCHY[userType] ?? 0;
+        const accessibleRoles = accountTypes.filter(type => (ROLE_HIERARCHY[type] ?? 0) <= userRoleLevel)
+
+        //Returns true if the provided account_type is one of the users allowed roles.
+        return accessibleRoles.includes(String(targetType))
+    } catch {
+        return false
+    }
+}
+
+/* ****************************************
+ *  Checks if user has permisssions to edit a certain account
+ * ************************************ */
+Util.canEditUser = async (req, res, next) => {
+    try {
+        const currentUser = res.locals.accountData;
+
+        if (!currentUser) {
+            req.flash("notice", "Please log in.");
+            return res.status(401).redirect("/account/login");
+        }
+
+        const targetAccount = await accountModel.getAccountById(req.params.accountId);
+
+        if (!targetAccount) {
+            req.flash("error", "Account not found.");
+            return res.status(404).redirect(req.get("Referrer") || "/account/");
+        }
+
+
+        if (await Util.canAccessRole(currentUser.account_type, targetAccount.account_type)) {
+            return next();
+        }
+
+        req.flash("notice", "You are not authorized to modify that account.");
+        return res.status(403).redirect(req.get("Referrer") || "/account/");
+
+    } catch (error) {
+        return next(error);
+    }
+};
+
 
 
 /* ****************************************

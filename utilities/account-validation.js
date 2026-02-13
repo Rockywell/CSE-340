@@ -54,6 +54,9 @@ validate.registationRules = () => {
     ]
 }
 
+/*  **********************************
+  *  Login Data Validation Rules
+  * ********************************* */
 validate.loginRules = () => {
     return [
         // valid email is required and cannot already exist in the DB
@@ -78,6 +81,9 @@ validate.loginRules = () => {
     ]
 }
 
+/*  **********************************
+  *  Update Data Validation Rules
+  * ********************************* */
 validate.updateRules = () => {
     return [
         // firstname
@@ -107,7 +113,7 @@ validate.updateRules = () => {
             .withMessage("A valid email is required.")
             .bail()
             .custom(async (account_email, { req }) => {
-                const account_id = req.body.account_id;
+                const account_id = utilities.getTargetAccountId(req);
                 // Skips checking for an existing email if it's unchanged.
                 if (await accountModel.checkExistingEmail(account_email, account_id)) return true;
 
@@ -130,7 +136,7 @@ validate.updateRules = () => {
             })
             .withMessage("Password does not meet requirements.")
             .custom(async (password, { req }) => {
-                const account_id = req.body.account_id;
+                const account_id = utilities.getTargetAccountId(req);
 
                 const passwordExists = await accountModel.checkExistingPassword(account_id, password);
 
@@ -141,6 +147,30 @@ validate.updateRules = () => {
     ]
 }
 
+/*  **********************************
+  *  Update Role/Account Type Data Validation Rules
+  * ********************************* */
+validate.updateTypeRules = () => {
+    return [
+        body("account_type")
+            .trim()
+            .notEmpty()
+            .withMessage("An account type is required.")
+            .bail()
+            .escape()
+            .custom(async (type, { req }) => {
+                const userAccount = await accountModel.getAccountById(req.actorId);
+                const validTypes = await accountModel.getAccountTypes();
+
+                // Checks if the provided type is one of the valid types e.g. ["Client", "Employee", "Admin"] and that the user can grant that type.
+                let roleIsAcessible = await utilities.canAccessRole(userAccount.account_type, type)
+
+                if (!roleIsAcessible) {
+                    throw new Error("You don't have permission to assign that account type.");
+                }
+            })
+    ]
+}
 
 /* ******************************
  * Check data and return errors or continue to registration
@@ -164,6 +194,9 @@ validate.checkRegData = async (req, res, next) => {
     next()
 }
 
+/* ******************************
+ * Check data and return errors or continue to login
+ * ***************************** */
 validate.checkLoginData = async (req, res, next) => {
     const { account_email } = req.body
     let errors = []
@@ -181,6 +214,9 @@ validate.checkLoginData = async (req, res, next) => {
     next()
 }
 
+/* ******************************
+ * Check data and return errors or continue to edit-account
+ * ***************************** */
 validate.checkUpdateData = async (req, res, next) => {
     const { account_firstname, account_lastname, account_email } = req.body
     let errors = []
@@ -194,6 +230,37 @@ validate.checkUpdateData = async (req, res, next) => {
             account_firstname,
             account_lastname,
             account_email
+        })
+        return
+    }
+    next()
+}
+
+/* ******************************
+ * Check data and return errors or continue to edit-account-role
+ * ***************************** */
+validate.checkRoleUpdateData = async (req, res, next) => {
+    const userAccount = res.locals.accountData;
+
+    let targetAccount = await accountModel.getAccountById(req.params.accountId);
+    delete targetAccount.account_password;
+
+    const { account_type } = req.body
+
+
+    let errors = []
+    errors = validationResult(req)
+    if (!errors.isEmpty()) {
+        let nav = await utilities.getNav()
+        let accountTypeSelect = await utilities.buildAccountTypeSelect(userAccount.account_type, targetAccount.account_type)
+
+        res.render("account/edit-account-role", {
+            errors,
+            title: "Edit Account Role",
+            nav,
+            account_type,
+            targetAccount,
+            accountTypeSelect,
         })
         return
     }

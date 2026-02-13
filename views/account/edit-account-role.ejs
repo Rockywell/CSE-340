@@ -1,0 +1,38 @@
+<% if (title) { %>
+    <h1>
+        <%= title %>
+    </h1>
+    <% } else { res.redirect('/') } %>
+
+        <%- messages() %>
+
+            <% if (errors) { %>
+                <ul class="error">
+                    <% errors.array().forEach(error=> { %>
+                        <li>
+                            <%= error.msg %>
+                        </li>
+                        <% }) %>
+                </ul>
+                <% } %>
+
+                    <form class="account updateForm" action="/account/update/<%= targetAccount.account_id %>/role"
+                        method="POST">
+                        <label for="accountFirstname">First name</label>
+                        <input type="text" id="accountFirstname" name="account_firstname" readonly
+                            value="<%= targetAccount.account_firstname %>">
+
+                        <label for="accountLastname">Last name</label>
+                        <input type="text" id="accountLastname" name="account_lastname" readonly
+                            value="<%= targetAccount.account_lastname %>">
+
+                        <label for="accountEmail">Email address</label>
+                        <input type="email" id="accountEmail" name="account_email"
+                            value="<%= targetAccount.account_email %>" readonly>
+
+                        <%- accountTypeSelect %>
+
+                            <button type="submit" disabled>Update Role</button>
+                    </form>
+
+                    <script src="/js/account-update.js"></script>

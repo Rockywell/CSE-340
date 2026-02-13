@@ -33,9 +33,11 @@ accountController.buildRegister = async function (req, res, next) {
 
 accountController.buildManager = async function (req, res) {
     const nav = await utilities.getNav()
+    const accountSelect = await utilities.buildAccountSelect(req.actorId)
     res.render("account/management", {
         title: "Account Management",
         nav,
+        accountSelect,
         errors: null
     })
 }
@@ -45,6 +47,25 @@ accountController.buildAccountEditor = async function (req, res) {
     res.render("account/edit-account", {
         title: "Edit Account",
         nav,
+        errors: null
+    })
+}
+
+accountController.buildAccountRoleEditor = async function (req, res) {
+    const userAccount = res.locals.accountData;
+
+    let targetAccount = await accountModel.getAccountById(req.params.accountId);
+    delete targetAccount.account_password;
+
+
+    const nav = await utilities.getNav()
+    const accountTypeSelect = await utilities.buildAccountTypeSelect(userAccount.account_type, targetAccount.account_type)
+
+    res.render("account/edit-account-role", {
+        title: "Edit Account Role",
+        nav,
+        targetAccount,
+        accountTypeSelect,
         errors: null
     })
 }
@@ -159,7 +180,6 @@ accountController.logout = async function (req, res) {
 accountController.updateAccount = async function (req, res) {
     try {
         const allowedFields = [
-            "account_id",
             "account_firstname",
             "account_lastname",
             "account_email",
@@ -171,18 +191,32 @@ accountController.updateAccount = async function (req, res) {
             ...req.body
         }
 
-        // Filters out fields from the request body that won't be used for account processing.
+        // Filters out fields from the request body that won't be used for account processing. ACCOUNT ID IS NOT INCLUDED
         const newAccountData = Object.fromEntries(
             Object.entries(newData).filter(([key]) =>
                 allowedFields.includes(key)
             )
         )
 
-
         // Hash the password if a new one was sent.
         if (req.body.account_password) newAccountData.account_password = bcrypt.hashSync(req.body.account_password, 10)
 
-        let accountResults = await accountModel.updateAccount(...Object.values(newAccountData))
+        // Assigning the account ID here prevents the client from overriding the ID.
+        const account_id = res.locals.accountData.account_id;
+        const {
+            account_firstname,
+            account_lastname,
+            account_email,
+            account_password,
+        } = newAccountData;
+
+        let accountResults = await accountModel.updateAccount(
+            account_id,
+            account_firstname,
+            account_lastname,
+            account_email,
+            account_password ?? null,
+        )
         delete accountResults.account_password;
 
         const accessToken = jwt.sign(accountResults, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 })
@@ -200,6 +234,39 @@ accountController.updateAccount = async function (req, res) {
         let accountName = `${res.locals.accountData.account_firstname} ${res.locals.accountData.account_lastname}`;
 
         await req.flash("error", `Sorry, the update failed for ${accountName}.`)
+        res.redirect("/account/")
+    }
+}
+
+
+accountController.updateAccountRole = async function (req, res) {
+    try {
+        const account_id = req.params.accountId;
+        const { account_type } = req.body;
+
+
+        let accountResults = await accountModel.updateAccountType(
+            account_id,
+            account_type,
+        )
+        delete accountResults.account_password;
+
+        // If you updated your own role, it updates the access token.
+        if (req.actorId == account_id) {
+            const accessToken = jwt.sign(accountResults, process.env.ACCESS_TOKEN_SECRET, { expiresIn: 3600 * 1000 })
+            if (process.env.NODE_ENV === 'development') {
+                res.cookie("jwt", accessToken, { httpOnly: true, maxAge: 3600 * 1000 })
+            } else {
+                res.cookie("jwt", accessToken, { httpOnly: true, secure: true, maxAge: 3600 * 1000 })
+            }
+        }
+
+        let accountName = `${accountResults.account_firstname} ${accountResults.account_lastname}`;
+
+        await req.flash("notice", `${accountName}'s account role was successfully updated to ${account_type}`)
+        res.redirect("/account/")
+    } catch (err) {
+        await req.flash("error", `Sorry, the role update failed.`)
         res.redirect("/account/")
     }
 }

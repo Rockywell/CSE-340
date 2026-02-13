@@ -30,9 +30,6 @@
                             value="<%= accountData.account_email %>" required>
 
                         <button type="submit" disabled>Update Account</button>
-                        <input type="hidden" name="account_id" <% if(locals.accountData.account_id) { %> value="<%=
-                            locals.accountData.account_id %>"
-                            <% } %>>
                     </form>
 
                     <h2>Update Password</h2>
@@ -48,9 +45,6 @@
                             pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$">
 
                         <button type="submit" disabled>Change Password</button>
-                        <input type="hidden" name="account_id" <% if(locals.accountData.account_id) { %> value="<%=
-                            locals.accountData.account_id %>"
-                            <% } %>>
                     </form>
 
                     <script src="/js/account-update.js"></script>
